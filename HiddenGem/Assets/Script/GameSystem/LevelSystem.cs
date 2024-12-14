@@ -31,7 +31,7 @@ namespace Tuleeeeee.GameSystem
 
         private int level = 1;
 
-        private bool isHorizontal; 
+        private bool isHorizontal;
         private bool isVertical;
 
         private void Awake()
@@ -69,125 +69,84 @@ namespace Tuleeeeee.GameSystem
             {
                 var listTile = new List<Tile>();
                 listTile = GetTileHideRune(rune.RuneType);
+                if (listTile.Count == 0)
+                    continue;
+
                 Debug.Log($"Checking Rune {rune.RuneType}:");
-                if (listTile.Count > 0)
-                {
-                    int totalRows = 0;
-                    int totalColumns = 0;
 
-                    isHorizontal = true;
-                    isVertical = true;
+                BoundsInt bounds = CalculateBounds(listTile, out isHorizontal, out isVertical);
 
-                    int minRow = listTile[0].row;
-                    int maxRow = listTile[0].row;
-                    int minColumn = listTile[0].column;
-                    int maxColumn = listTile[0].column;
-
-
-                    for (int i = 0; i < listTile.Count; i++)
-                    {
-                        int currentRow = listTile[i].row;
-                        int currentColumn = listTile[i].column;
-
-                        totalRows += listTile[i].row;
-                        totalColumns += listTile[i].column;
-
-
-                        Debug.Log($"{listTile[i].row} , {listTile[i].column}");
-
-
-                        minRow = Mathf.Min(minRow, currentRow);
-                        maxRow = Mathf.Max(maxRow, currentRow);
-                        minColumn = Mathf.Min(minColumn, currentColumn);
-                        maxColumn = Mathf.Max(maxColumn, currentColumn);
-
-
-                        if (listTile[i].row != listTile[0].row)
-                        {
-                            isHorizontal = false;
-                        }
-
-                        else if (listTile[i].column != listTile[0].column)
-                        {
-                            isVertical = false;
-                        }
-                    }
-
-                    int middleRow = totalRows / listTile.Count;
-                    int middleColumn = totalColumns / listTile.Count;
-
-                    int rowDifference = maxRow - minRow + 1;
-                    int columnDifference = maxColumn - minColumn + 1;
-
-                    Debug.Log($"Middle Row: {middleRow}, Middle Column: {middleColumn}");
-
-                    if (rowDifference == columnDifference)
-                    {
-                        Debug.Log($"Rune {rune.RuneType} is a squere {rowDifference}X{columnDifference}.");
-                        var runeObject =
-                            Instantiate(rune, GetCenterPosition(listTile),
-                                Quaternion.identity); // Xoay 90 độ quanh trục Z;
-                        runPrefabsIntances.Add(runeObject);
-                    }
-                    else if (isHorizontal)
-                    {
-                        Debug.Log($"Rune {rune.RuneType} is aligned horizontally.");
-                        var runeObject = Instantiate(rune, new Vector3(middleColumn, middleRow),
-                            Quaternion.Euler(0, 0, 90)); // Xoay 90 độ quanh trục Z;
-                        runPrefabsIntances.Add(runeObject);
-                    }
-                    else if (isVertical)
-                    {
-                        Debug.Log($"Rune {rune.RuneType} is aligned vertically.");
-                        var runeObject = Instantiate(rune, new Vector3(middleColumn, middleRow), Quaternion.identity);
-                        runPrefabsIntances.Add(runeObject);
-                    }
-                    else
-                    {
-                        Debug.Log($"Rune {rune.RuneType} is neither purely horizontal nor vertical.");
-                    }
-                }
+                Vector3 centerPosition = GetCenterPosition(bounds);
+                HandleRunePlacement(rune, bounds, isHorizontal, isVertical, centerPosition);
             }
         }
 
-        float CalculateCenterRow(List<Tile> tiles)
+        private BoundsInt CalculateBounds(List<Tile> listTile, out bool isHorizontal, out bool isVertical)
         {
-            int minRow = tiles[0].row;
-            int maxRow = tiles[0].row;
+            int minRow = int.MaxValue, maxRow = int.MinValue;
+            int minColumn = int.MaxValue, maxColumn = int.MinValue;
 
-            foreach (var tile in tiles)
+            isHorizontal = true;
+            isVertical = true;
+
+            int baseRow = listTile[0].row;
+            int baseColumn = listTile[0].column;
+
+            foreach (var tile in listTile)
             {
                 minRow = Mathf.Min(minRow, tile.row);
                 maxRow = Mathf.Max(maxRow, tile.row);
-            }
-
-            return (minRow + maxRow) / 2f; // Center Row
-        }
-
-        float CalculateCenterColumn(List<Tile> tiles)
-        {
-            int minColumn = tiles[0].column;
-            int maxColumn = tiles[0].column;
-
-            foreach (var tile in tiles)
-            {
                 minColumn = Mathf.Min(minColumn, tile.column);
                 maxColumn = Mathf.Max(maxColumn, tile.column);
+
+                if (tile.row != baseRow)
+                    isHorizontal = false;
+                if (tile.column != baseColumn)
+                    isVertical = false;
+
+                Debug.Log($"Tile Position: Row {tile.row}, Column {tile.column}");
             }
 
-            return (minColumn + maxColumn) / 2f; // Center Column
+            return new BoundsInt(new Vector3Int(minColumn, minRow, 0),
+                new Vector3Int(maxColumn - minColumn + 1, maxRow - minRow + 1, 0));
         }
 
-        Vector3 GetCenterPosition(List<Tile> tiles, float tileSize = 1f)
+        private void HandleRunePlacement(Rune rune, BoundsInt bounds, bool isHorizontal, bool isVertical,
+            Vector3 centerPosition)
         {
-            float centerRow = CalculateCenterRow(tiles);
-            float centerColumn = CalculateCenterColumn(tiles);
+            if (bounds.size.x == bounds.size.y)
+            {
+                Debug.Log($"Rune {rune.RuneType} is a square {bounds.size.x}x{bounds.size.y}.");
+                InstantiateRune(rune, centerPosition, Quaternion.identity);
+            }
+            else if (isHorizontal)
+            {
+                Debug.Log($"Rune {rune.RuneType} is aligned horizontally.");
+                InstantiateRune(rune, centerPosition, Quaternion.Euler(0, 0, 90));
+            }
+            else if (isVertical)
+            {
+                Debug.Log($"Rune {rune.RuneType} is aligned vertically.");
+                InstantiateRune(rune, centerPosition, Quaternion.identity);
+            }
+            else
+            {
+                Debug.Log($"Rune {rune.RuneType} is neither purely horizontal nor vertical.");
+            }
+        }
 
-            // Adjust for world space if needed (tileSize)
-            float worldX = centerColumn * tileSize;
-            float worldY = centerRow * tileSize;
+        private void InstantiateRune(Rune rune, Vector3 position, Quaternion rotation)
+        {
+            var runeObject = Instantiate(rune, position, rotation);
+            runPrefabsIntances.Add(runeObject);
+        }
 
-            return new Vector3(worldX, worldY, 0f);
+        private Vector3 GetCenterPosition(BoundsInt bounds)
+        {
+            float centerRow = bounds.min.y + (bounds.size.y - 1) / 2f;
+            float centerColumn = bounds.min.x + (bounds.size.x - 1) / 2f;
+
+            return new Vector3(centerColumn, -centerRow, 0);
         }
 
         private List<Tile> GetTileHideRune(RuneType runeRuneType)
@@ -201,7 +160,7 @@ namespace Tuleeeeee.GameSystem
             {
                 for (int row = 0; row < currentLevelData.Rows; row++)
                 {
-                    var tile = Instantiate(tilePrefab, new Vector3(col, row, 0), Quaternion.identity);
+                    var tile = Instantiate(tilePrefab, new Vector3(col, -row, 0), Quaternion.identity);
                     tile.Init(col, row, currentLevelData.Table[col, row]);
                     tiles.Add(tile);
                 }

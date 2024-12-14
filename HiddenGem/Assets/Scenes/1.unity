@@ -401,6 +401,7 @@ MonoBehaviour:
   runePrefab:
   - {fileID: 2272856525754649366, guid: 5ac6ee4504fd3334895d19baeb7cb5a4, type: 3}
   - {fileID: 6756732667232527117, guid: 4c2e7c99ca2b5ce41843552c151579a4, type: 3}
+  - {fileID: 8013199691912352326, guid: 48a276ecb8a9a91418a98cee0773a664, type: 3}
   currentMissionDestination: {fileID: 2148446512203648802, guid: 3fdaf692d4598564a8e120f558a4e434, type: 3}
 --- !u!4 &1496485283
 Transform:
