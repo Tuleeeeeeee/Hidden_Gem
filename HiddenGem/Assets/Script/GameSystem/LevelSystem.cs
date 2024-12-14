@@ -31,7 +31,7 @@ namespace Tuleeeeee.GameSystem
 
         private int level = 1;
 
-        private bool isHorizontal; // Assume horizontal alignment by default
+        private bool isHorizontal; 
         private bool isVertical;
 
         private void Awake()
@@ -77,12 +77,31 @@ namespace Tuleeeeee.GameSystem
 
                     isHorizontal = true;
                     isVertical = true;
+
+                    int minRow = listTile[0].row;
+                    int maxRow = listTile[0].row;
+                    int minColumn = listTile[0].column;
+                    int maxColumn = listTile[0].column;
+
+
                     for (int i = 0; i < listTile.Count; i++)
                     {
+                        int currentRow = listTile[i].row;
+                        int currentColumn = listTile[i].column;
+
                         totalRows += listTile[i].row;
                         totalColumns += listTile[i].column;
-                        Debug.Log($"0:{listTile[1].row} , 0:{listTile[1].column}");
+
+
                         Debug.Log($"{listTile[i].row} , {listTile[i].column}");
+
+
+                        minRow = Mathf.Min(minRow, currentRow);
+                        maxRow = Mathf.Max(maxRow, currentRow);
+                        minColumn = Mathf.Min(minColumn, currentColumn);
+                        maxColumn = Mathf.Max(maxColumn, currentColumn);
+
+
                         if (listTile[i].row != listTile[0].row)
                         {
                             isHorizontal = false;
@@ -96,9 +115,21 @@ namespace Tuleeeeee.GameSystem
 
                     int middleRow = totalRows / listTile.Count;
                     int middleColumn = totalColumns / listTile.Count;
+
+                    int rowDifference = maxRow - minRow + 1;
+                    int columnDifference = maxColumn - minColumn + 1;
+
                     Debug.Log($"Middle Row: {middleRow}, Middle Column: {middleColumn}");
 
-                    if (isHorizontal)
+                    if (rowDifference == columnDifference)
+                    {
+                        Debug.Log($"Rune {rune.RuneType} is a squere {rowDifference}X{columnDifference}.");
+                        var runeObject =
+                            Instantiate(rune, GetCenterPosition(listTile),
+                                Quaternion.identity); // Xoay 90 độ quanh trục Z;
+                        runPrefabsIntances.Add(runeObject);
+                    }
+                    else if (isHorizontal)
                     {
                         Debug.Log($"Rune {rune.RuneType} is aligned horizontally.");
                         var runeObject = Instantiate(rune, new Vector3(middleColumn, middleRow),
@@ -117,6 +148,46 @@ namespace Tuleeeeee.GameSystem
                     }
                 }
             }
+        }
+
+        float CalculateCenterRow(List<Tile> tiles)
+        {
+            int minRow = tiles[0].row;
+            int maxRow = tiles[0].row;
+
+            foreach (var tile in tiles)
+            {
+                minRow = Mathf.Min(minRow, tile.row);
+                maxRow = Mathf.Max(maxRow, tile.row);
+            }
+
+            return (minRow + maxRow) / 2f; // Center Row
+        }
+
+        float CalculateCenterColumn(List<Tile> tiles)
+        {
+            int minColumn = tiles[0].column;
+            int maxColumn = tiles[0].column;
+
+            foreach (var tile in tiles)
+            {
+                minColumn = Mathf.Min(minColumn, tile.column);
+                maxColumn = Mathf.Max(maxColumn, tile.column);
+            }
+
+            return (minColumn + maxColumn) / 2f; // Center Column
+        }
+
+        Vector3 GetCenterPosition(List<Tile> tiles, float tileSize = 1f)
+        {
+            float centerRow = CalculateCenterRow(tiles);
+            float centerColumn = CalculateCenterColumn(tiles);
+
+            // Adjust for world space if needed (tileSize)
+            float worldX = centerColumn * tileSize;
+            float worldY = centerRow * tileSize;
+
+            return new Vector3(worldX, worldY, 0f);
         }
 
         private List<Tile> GetTileHideRune(RuneType runeRuneType)
