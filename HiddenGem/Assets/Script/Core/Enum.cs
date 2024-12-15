@@ -9,11 +9,14 @@ namespace Tuleeeeee.Enum
     public enum RuneType
     {
         None,
-        Red1,
-        Red2,
-        Green1,
-        Green2,
-        Blue1,
-        Blue2,
+        Red1x2,
+        Blue1x3,
+        Green1x4,
+        Purple1x5,
+        Blue2x2,
+        Yellow2x3,
+        Pink2x4,
+        Orange3x3,
+        Brown4x4,
     }
 }

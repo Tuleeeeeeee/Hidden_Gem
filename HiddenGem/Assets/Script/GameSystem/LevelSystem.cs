@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Tuleeeeee.Delegate;
 using Sirenix.OdinInspector;
 using Tuleeeeee.Enum;
 using Tuleeeeee.Features.Mission;
 using Tuleeeeee.GameData;
+using Tuleeeeee.Model;
 using Tuleeeeee.Runes;
 using UnityEngine;
 
@@ -19,6 +21,7 @@ namespace Tuleeeeee.GameSystem
         [SerializeField] private MissionDestinationData _missionDestinationData;
 
         private LevelData currentLevelData;
+        private LevelModel levelModel;
 
         [TableMatrix, SerializeField] private RuneType[,] cloneTable;
 
@@ -27,12 +30,14 @@ namespace Tuleeeeee.GameSystem
         public MissionDestination currentMissionDestination;
 
         private List<Tile> tiles = new List<Tile>();
-        private List<Rune> runPrefabsIntances = new List<Rune>();
 
         private int level = 1;
 
         private bool isHorizontal;
         private bool isVertical;
+
+        private OnClearRune OnClearRune;
+        private OnLevelClear OnLevelClear;
 
         private void Awake()
         {
@@ -41,8 +46,29 @@ namespace Tuleeeeee.GameSystem
 
         private void Start()
         {
+            levelModel = new LevelModel();
             GenerateLevel(level);
             GenerateMission(level);
+        }
+
+        public void RegisterOnClearRune(OnClearRune onClearRune)
+        {
+            OnClearRune += onClearRune;
+        }
+
+        public void UnRegisterOnClearRune(OnClearRune onClearRune)
+        {
+            OnClearRune -= onClearRune;
+        }
+
+        public void RegisterOnLevelClear(OnLevelClear onLevelClear)
+        {
+            OnLevelClear += onLevelClear;
+        }
+
+        public void UnRegisterOnLevelClear(OnLevelClear onLevelClear)
+        {
+            OnLevelClear -= onLevelClear;
         }
 
         private void GenerateMission(int level)
@@ -54,8 +80,8 @@ namespace Tuleeeeee.GameSystem
         private void GenerateLevel(int level)
         {
             currentLevelData = _managerGameLevel.GetLevel(level);
-            cloneTable = (RuneType[,])currentLevelData.Table.Clone();
-
+            levelModel.CloneTable = (RuneType[,])currentLevelData.Table.Clone();
+            levelModel.CrushCount = currentLevelData.CrushCount;
             // create Tile map
             GenerateTile();
 
@@ -137,8 +163,7 @@ namespace Tuleeeeee.GameSystem
 
         private void InstantiateRune(Rune rune, Vector3 position, Quaternion rotation)
         {
-            var runeObject = Instantiate(rune, position, rotation);
-            runPrefabsIntances.Add(runeObject);
+            Instantiate(rune, position, rotation);
         }
 
         private Vector3 GetCenterPosition(BoundsInt bounds)
@@ -179,25 +204,21 @@ namespace Tuleeeeee.GameSystem
                 return;
             }
 
-            cloneTable[column, row] = RuneType.None;
+            levelModel.CloneTable[column, row] = RuneType.None;
+            levelModel.CrushCount--;
 
             if (IsClearType(type))
             {
                 // set animation fly
                 Debug.Log("Fly");
-                foreach (var rune in runPrefabsIntances)
-                {
-                    if (rune.RuneType == type)
-                    {
-                        rune.FlyToDestination();
-                    }
-                }
+                OnClearRune?.Invoke(type);
+                return;
             }
         }
 
         public bool IsClearType(RuneType type)
         {
-            foreach (var cell in cloneTable)
+            foreach (var cell in levelModel.CloneTable)
             {
                 if (cell == type)
                     return false;
@@ -209,6 +230,19 @@ namespace Tuleeeeee.GameSystem
         public Transform GetDestination(RuneType runeType)
         {
             return currentMissionDestination.GetDestination(runeType);
+        }
+
+        public void CheckLevelClear()
+        {
+            if (!levelModel.HasClear()) return;
+            Debug.Log("Level clear");
+            OnLevelClear?.Invoke();
+            // clear curent level
+            DestroyRestTiles();
+        }
+
+        private void DestroyRestTiles()
+        {
         }
     }
 }

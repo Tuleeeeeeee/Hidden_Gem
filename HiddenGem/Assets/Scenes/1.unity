@@ -399,9 +399,15 @@ MonoBehaviour:
   _missionDestinationData: {fileID: 11400000, guid: 4ecae67a4aa270442a3a84a85734bc48, type: 2}
   tilePrefab: {fileID: 2951852300273456439, guid: d72a23fb649d4004bb3d1dc419553d81, type: 3}
   runePrefab:
-  - {fileID: 2272856525754649366, guid: 5ac6ee4504fd3334895d19baeb7cb5a4, type: 3}
+  - {fileID: 2589421468042686161, guid: c0ae521901144a04baced1d162f206ec, type: 3}
   - {fileID: 6756732667232527117, guid: 4c2e7c99ca2b5ce41843552c151579a4, type: 3}
+  - {fileID: 4292590087088587241, guid: f6cbbe6c905f75d4ba9e50a1ea1d1c5d, type: 3}
+  - {fileID: 4002410383172457229, guid: 7a91c7d3c40967040972fcf594e8ecaf, type: 3}
+  - {fileID: 4815829228967368703, guid: 761c9fa2245a39844812f97721851cb5, type: 3}
+  - {fileID: 1933411821322497198, guid: f55502d1e5c1e5448a8c4472f31f944a, type: 3}
   - {fileID: 8013199691912352326, guid: 48a276ecb8a9a91418a98cee0773a664, type: 3}
+  - {fileID: 2272856525754649366, guid: 5ac6ee4504fd3334895d19baeb7cb5a4, type: 3}
+  - {fileID: 414919901335503421, guid: 86a9a2fd7ba895242ab2d6b4bdb0d46c, type: 3}
   currentMissionDestination: {fileID: 2148446512203648802, guid: 3fdaf692d4598564a8e120f558a4e434, type: 3}
 --- !u!4 &1496485283
 Transform:

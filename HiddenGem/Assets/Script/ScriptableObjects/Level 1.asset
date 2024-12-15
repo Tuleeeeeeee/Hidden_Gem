@@ -32,19 +32,19 @@ MonoBehaviour:
       Data: 5|5
     - Name: 
       Entry: 3
-      Data: 0
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 2
     - Name: 
       Entry: 3
       Data: 0
     - Name: 
       Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 3
-      Data: 5
+      Data: 3
     - Name: 
       Entry: 3
       Data: 0
@@ -56,40 +56,40 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 3
-      Data: 1
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 3
       Data: 5
     - Name: 
       Entry: 3
-      Data: 0
+      Data: 5
+    - Name: 
+      Entry: 3
+      Data: 3
     - Name: 
       Entry: 3
       Data: 0
     - Name: 
       Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 3
-      Data: 6
+      Data: 0
     - Name: 
       Entry: 3
       Data: 5
     - Name: 
       Entry: 3
-      Data: 0
+      Data: 5
     - Name: 
       Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 3
-      Data: 0
+      Data: 3
     - Name: 
       Entry: 3
       Data: 0
@@ -114,3 +114,4 @@ MonoBehaviour:
   Level: 1
   Rows: 5
   Columns: 5
+  CrushCount: 10

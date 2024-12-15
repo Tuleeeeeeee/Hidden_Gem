@@ -9,7 +9,9 @@ public class LevelData : SerializedScriptableObject
 
     public int Rows;
     public int Columns;
-     
+    
+    public int CrushCount = 10;
+    
     [TableMatrix(SquareCells = true)]
     public RuneType[,] Table;
 

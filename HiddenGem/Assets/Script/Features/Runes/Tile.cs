@@ -8,8 +8,8 @@ namespace Tuleeeeee.Runes
     {
         public RuneType runeType;
 
-        public int row { get; private set; }
         public int column { get; private set; }
+        public int row { get; private set; }
 
         public void Init(int column, int row, RuneType runeType)
         {

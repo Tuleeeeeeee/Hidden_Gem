@@ -9,17 +9,25 @@ namespace Tuleeeeee.Runes
     public class Rune : MonoBehaviour
     {
         public RuneType RuneType;
-        private Vector3 initialPosition;
-        private Vector3 initialScale;
-
+        
         private void Start()
         {
-            // Lưu giá trị ban đầu
-            initialPosition = transform.localPosition;
-            initialScale = transform.localScale;
+            var levelSystem = LevelSystem.Instance;
+            levelSystem.RegisterOnClearRune(OnClearRune);
         }
 
-    
+        private void OnDestroy()
+        {
+            var levelSystem = LevelSystem.Instance;
+            levelSystem.UnRegisterOnClearRune(OnClearRune);
+        }
+        private void OnClearRune(RuneType runetype)
+        {
+            if (RuneType == runetype)
+            {
+                FlyToDestination();
+            }
+        }
         public void Init(RuneType runeType)
         {
             RuneType = runeType;
@@ -35,6 +43,11 @@ namespace Tuleeeeee.Runes
 
             seq.Append(transform.DOScale(Vector3.one * 1.2f, 0.5f));
             seq.Append(transform.DOMove(level.position, 0.5f)).Join(transform.DOScale(Vector3.one * 0.5f, 0.5f));
+            seq.AppendCallback(() =>
+            {
+                transform.SetParent(levelSystem.currentMissionDestination.transform);
+                levelSystem.CheckLevelClear();
+            });
             seq.Play();
         }
     }
