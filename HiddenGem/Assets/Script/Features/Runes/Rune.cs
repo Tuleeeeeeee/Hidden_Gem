@@ -24,9 +24,9 @@ namespace Tuleeeeee.Runes
             levelSystem.UnRegisterOnClearRune(OnClearRune);
         }
 
-        private void OnClearRune(RuneType runetype, int id)
+        private void OnClearRune(RuneType runeType, int id)
         {
-            if (RuneType == runetype)
+            if (RuneType == runeType && RuneId == id)
             {
                 FlyToDestination();
             }
@@ -45,7 +45,7 @@ namespace Tuleeeeee.Runes
         {
             var levelSystem = LevelSystem.Instance;
 
-            var level = levelSystem.GetDestination(RuneType);
+            var level = levelSystem.GetDestination(RuneType, RuneId);
             var seq = DOTween.Sequence();
 
             seq.Append(transform.DOScale(transform.localScale * 1.5f, 1f));

@@ -30,9 +30,6 @@ namespace Tuleeeeee.GameSystem
 
         private List<Tile> tiles = new List<Tile>();
 
-// A list to hold all instantiated runes
-        private List<Rune> allRunes = new List<Rune>();
-
 
         private int level = 1;
         private int runeIdCounter = 0;
@@ -81,8 +78,12 @@ namespace Tuleeeeee.GameSystem
         private void GenerateLevel(int level)
         {
             currentLevelData = _managerGameLevel.GetLevel(level);
-
-            levelModel.CloneTable = (RuneType[,])currentLevelData.Table.Clone();
+            
+            currentLevelData.CreateTable();
+            currentLevelData.RandomRunes();
+            
+            
+            levelModel.CloneTable = (RuneMap[,])currentLevelData.Table.Clone();
 
             levelModel.CrushCount = currentLevelData.CrushCount;
 
@@ -95,32 +96,23 @@ namespace Tuleeeeee.GameSystem
 
         private void GenerateRune()
         {
+            List<RuneMap> runeMaps = currentLevelData.GetRuneMaps();
             foreach (var rune in currentLevelData.runePrefab)
             {
-                // Access all RuneMap objects at once (since we don't need to call GetRuneMaps every loop iteration)
-                List<RuneMap> runeMaps = currentLevelData.GetRuneMaps();
-
-                // Iterate through each RuneMap
-                foreach (var runeMap in runeMaps)
+                Debug.Log($"Checking Rune {rune.RuneType}:");
+                foreach (var runMap in runeMaps)
                 {
-                    // Only proceed if the RuneType matches the current rune being processed
-                    if (runeMap.RuneType == rune.RuneType)
-                    {
-                        Debug.Log($"Rune Type: {runeMap.RuneType}, Group: {runeMap.Group}");
-
-                        // Now, proceed to calculate bounds and handle placement
-                        List<Tile>
-                            listTile = GetTileHideRune(runeMap.RuneType,
-                                runeMap.Group); // You need a method to get tiles for the group
-                        BoundsInt bounds = CalculateBounds(listTile);
-                        Debug.Log($"Rune bounds: {bounds.size}");
-
-                        Vector3 centerPosition = GetCenterPosition(bounds);
-                        Debug.Log($"Center Position: {centerPosition}");
-
-                        // Handle the rune placement based on its bounds
-                        HandleRunePlacement(rune, bounds, centerPosition);
-                    }
+                    List<Tile> listTile = GetTileHideRune(rune.RuneType, runMap.Group);
+                    if (listTile.Count == 0)
+                        continue;
+                    Debug.Log($"Checking Rune {rune.RuneType} in list:");
+                    Debug.Log($"Caculate Rune {rune.RuneType} bound:");
+                    BoundsInt bounds = CalculateBounds(listTile);
+                    Debug.Log($"Rune bounds: {bounds.size}");
+                    Vector3 centerPosition = GetCenterPosition(bounds);
+                    Debug.Log($"Center Position: {centerPosition}");
+                    // Handle the rune placement based on its bounds
+                    HandleRunePlacement(rune, bounds, centerPosition, runMap.Group);
                 }
             }
         }
@@ -148,7 +140,7 @@ namespace Tuleeeeee.GameSystem
                 new Vector3Int(maxRow - minRow + 1, maxColumn - minColumn + 1, 0));
         }
 
-        private void HandleRunePlacement(Rune rune, BoundsInt bounds, Vector3 centerPosition)
+        private void HandleRunePlacement(Rune rune, BoundsInt bounds, Vector3 centerPosition, int id)
         {
             int width = bounds.size.x;
             int height = bounds.size.y;
@@ -156,17 +148,17 @@ namespace Tuleeeeee.GameSystem
             if (width == height)
             {
                 Debug.Log($"Rune {rune.RuneType} is a square {bounds.size.x}x{bounds.size.y}.");
-                InstantiateRune(rune, centerPosition, Quaternion.identity);
+                InstantiateRune(rune, centerPosition, Quaternion.identity, id);
             }
             else if (width > height)
             {
                 Debug.Log($"Rune {rune.RuneType} is aligned horizontally.");
-                InstantiateRune(rune, centerPosition, Quaternion.Euler(0, 0, 90));
+                InstantiateRune(rune, centerPosition, Quaternion.Euler(0, 0, 90), id);
             }
             else if (width < height)
             {
                 Debug.Log($"Rune {rune.RuneType} is aligned vertically.");
-                InstantiateRune(rune, centerPosition, Quaternion.identity);
+                InstantiateRune(rune, centerPosition, Quaternion.identity, id);
             }
             else
             {
@@ -174,11 +166,10 @@ namespace Tuleeeeee.GameSystem
             }
         }
 
-        private void InstantiateRune(Rune rune, Vector3 position, Quaternion rotation)
+        private void InstantiateRune(Rune rune, Vector3 position, Quaternion rotation, int id)
         {
             Rune newRune = Instantiate(rune, position, rotation);
-            newRune.Init(rune.RuneType, Vector3.one, runeIdCounter++);
-            allRunes.Add(newRune);
+            newRune.Init(rune.RuneType, Vector3.one, id);
         }
 
         private Vector3 GetCenterPosition(BoundsInt bounds)
@@ -188,55 +179,6 @@ namespace Tuleeeeee.GameSystem
 
             return new Vector3(centerRow, -centerColumn, 0);
         }
-
-        /*private List<List<Tile>> GetTileGroupsByRuneType(RuneType targetType)
-        {
-            var visited = new bool[currentLevelData.Rows, currentLevelData.Columns];
-            var tileGroups = new List<List<Tile>>();
-
-            for (int row = 0; row < currentLevelData.Rows; row++)
-            {
-                for (int col = 0; col < currentLevelData.Columns; col++)
-                {
-                    // Skip if not the target RuneType or already visited
-                    if (currentLevelData.Table[row, col] != targetType || visited[row, col])
-                        continue;
-
-                    // Perform flood fill and collect connected tiles
-                    var group = new List<Tile>();
-                    FloodFill(row, col, targetType, visited, group);
-                    if (group.Count > 0)
-                        tileGroups.Add(group);
-                }
-            }
-
-            return tileGroups;
-        }*/
-
-        /*private void FloodFill(int row, int col, RuneType targetType, bool[,] visited, List<Tile> group)
-        {
-            // Check bounds and already visited
-            if (row < 0 || row >= currentLevelData.Rows || col < 0 || col >= currentLevelData.Columns ||
-                visited[row, col])
-                return;
-
-            // Check if the tile matches the RuneType
-            if (currentLevelData.Table[row, col] != targetType)
-                return;
-
-            // Mark the tile as visited and add it to the group
-            visited[row, col] = true;
-            var tile = tiles.FirstOrDefault(t => t.row == row && t.column == col);
-            if (tile != null)
-                group.Add(tile);
-
-            // Recursive calls to check neighboring tiles
-            FloodFill(row + 1, col, targetType, visited, group); // Down
-            FloodFill(row - 1, col, targetType, visited, group); // Up
-            FloodFill(row, col + 1, targetType, visited, group); // Right
-            FloodFill(row, col - 1, targetType, visited, group); // Left
-        }*/
-
         private List<Tile> GetTileHideRune(RuneType runeRuneType, int groupId)
         {
             return tiles.Where(x => x.runeType == runeRuneType && x.id == groupId).ToList();
@@ -250,16 +192,12 @@ namespace Tuleeeeee.GameSystem
             {
                 for (int col = 0; col < currentLevelData.Columns; col++)
                 {
-                    RuneMap matchingRuneMap =
-                        currentLevelData.runeMaps.FirstOrDefault(rm =>
-                            rm.RuneType == currentLevelData.Table[row, col]);
-                    int group = matchingRuneMap != null ? matchingRuneMap.Group : -1;
-
-                    var tile = Instantiate(currentLevelData.tilePrefab, new Vector3(row, -col, 0), Quaternion.identity);
-                    tile.Init(row, col, currentLevelData.Table[row, col], group);
+                    var tile = Instantiate(currentLevelData.tilePrefab, new Vector3(row, -col, 0),
+                        Quaternion.identity);
+                    tile.Init(row, col, currentLevelData.Table[row, col].RuneType,
+                        currentLevelData.Table[row, col].Group);
                     tile.transform.SetParent(tileContainer.transform);
                     tiles.Add(tile);
-                    Debug.Log($"Tile ID: {tile.id}, Group: {group}");
                 }
             }
         }
@@ -282,37 +220,39 @@ namespace Tuleeeeee.GameSystem
                 return;
             }
 
-            if (currentLevelData.Table[row, column] == RuneType.None)
+            if (currentLevelData.Table[row, column].RuneType == RuneType.None)
             {
                 return;
             }
 
-            levelModel.CloneTable[row, column] = RuneType.None;
+            levelModel.CloneTable[row, column].RuneType = RuneType.None;
             levelModel.CrushCount--;
 
-            if (IsClearType(type))
+            if (IsClearType(type, id))
             {
                 OnClearRune?.Invoke(type, id);
                 return;
             }
         }
 
-        bool IsClearType(RuneType type)
+        bool IsClearType(RuneType type, int id)
         {
             foreach (var cell in levelModel.CloneTable)
             {
-                if (cell == type)
+                if (cell.RuneType == type && cell.Group == id)
                     return false;
             }
 
             return true;
         }
-
-        public Transform GetDestination(RuneType runeType)
+        public List<RuneMap> GetRuneMaps()
         {
-            return currentMissionDestination.GetDestination(runeType);
+            return currentLevelData.GetRuneMaps();
         }
-
+        public Transform GetDestination(RuneType runeType, int id)
+        {
+            return currentMissionDestination.GetDestination(runeType, id);
+        }
         public void CheckLevelClear()
         {
             if (!levelModel.HasClear()) return;

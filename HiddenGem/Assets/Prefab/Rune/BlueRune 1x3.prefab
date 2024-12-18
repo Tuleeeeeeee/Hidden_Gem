@@ -97,6 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 870c01fbc9cd4043996342615ff9905d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RuneType: 3
+  RuneType: 2
   RuneId: 0
   RunSize: {x: 0, y: 0, z: 0}

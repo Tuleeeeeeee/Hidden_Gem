@@ -10,25 +10,40 @@ namespace Tuleeeeee.Features.Mission
     public class MissionDestination : MonoBehaviour
     {
         public int level = 1;
-        public List<Destination> Destinations;
+        public Destination destination;
+        public List<Destination> Destination;
+        public List<Transform> targetsPosition;
 
-        public Transform GetDestination(RuneType runeType)
+        public Transform GetDestination(RuneType runeType, int id)
         {
-            return Destinations.Find(x => x.runeType == runeType).transform;
+            return Destination.Find(x => x.runeType == runeType && x.id == id).transform;
         }
-        
-        public Transform GetClosestDestination(RuneType runeType, Vector3 position)
+
+        private void InstantiateDestination(Destination des, RuneType runeType, Vector3 position, Quaternion rotation,
+            int id, Transform parent)
         {
-            return Destinations
-                .Where(x => x.runeType == runeType)
-                .OrderBy(x => Vector3.Distance(x.transform.position, position))
-                .FirstOrDefault()?.transform;
+            Destination newDestination = Instantiate(des, position, rotation);
+            newDestination.Init(runeType, id);
+            newDestination.transform.SetParent(parent);
+            Destination.Add(newDestination);
         }
 
         private void Start()
         {
             var levelSystem = LevelSystem.Instance;
             levelSystem.RegisterOnLevelClear(OnLevelClear);
+            List<RuneMap> runeMaps = levelSystem.GetRuneMaps();
+
+            for (int i = 0; i < runeMaps.Count; i++)
+            {
+                var rune = runeMaps[i];
+                // Get the target position from the list (use i for the index)
+                Transform targetTransform = targetsPosition[i];
+
+                // Instantiate the destination with the correct position and rotation
+                InstantiateDestination(destination, rune.RuneType, targetTransform.position, targetTransform.rotation,
+                    rune.Group, targetTransform);
+            }
         }
 
         private void OnDestroy()
