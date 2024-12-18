@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6627f0ed0ba24d544b3c2507a8576568, type: 3}
-  m_Name: ManagerGameLevel
+  m_Script: {fileID: 11500000, guid: 2f35c25b4a24fa84ab265d8d495a265b, type: 3}
+  m_Name: Le
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -20,10 +20,13 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
-  LevelDatas:
-  - {fileID: 11400000, guid: e5c461a634a1781408744d143b58966b, type: 2}
-  - {fileID: 11400000, guid: 695f8049f3ebc5f44ade5f4fcf68a268, type: 2}
-  - {fileID: 11400000, guid: 15ecfa16716b09c4a9e384d17e9901d9, type: 2}
-  - {fileID: 11400000, guid: 0d475865d8bcf8c43a3609612557897e, type: 2}
-  - {fileID: 11400000, guid: 869642cba1643b1408156ea788fca2b3, type: 2}
+    SerializationNodes:
+    - Name: Table
+      Entry: 6
+      Data: 
+  Level: 0
+  Rows: 0
+  Columns: 0
+  CrushCount: 10
+  RuneConfig: {fileID: 0}
+  useRune: []

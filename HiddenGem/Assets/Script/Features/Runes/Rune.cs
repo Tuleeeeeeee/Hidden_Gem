@@ -9,7 +9,9 @@ namespace Tuleeeeee.Runes
     public class Rune : MonoBehaviour
     {
         public RuneType RuneType;
-        
+        public int RuneId;
+        public Vector3 RunSize;
+
         private void Start()
         {
             var levelSystem = LevelSystem.Instance;
@@ -21,17 +23,22 @@ namespace Tuleeeeee.Runes
             var levelSystem = LevelSystem.Instance;
             levelSystem.UnRegisterOnClearRune(OnClearRune);
         }
-        private void OnClearRune(RuneType runetype)
+
+        private void OnClearRune(RuneType runetype, int id)
         {
             if (RuneType == runetype)
             {
                 FlyToDestination();
             }
         }
-        public void Init(RuneType runeType)
+
+        public void Init(RuneType runeType, Vector3 size, int id)
         {
             RuneType = runeType;
+            RunSize = size;
+            RuneId = id;
         }
+
 
         [Button]
         public void FlyToDestination()
@@ -41,8 +48,8 @@ namespace Tuleeeeee.Runes
             var level = levelSystem.GetDestination(RuneType);
             var seq = DOTween.Sequence();
 
-            seq.Append(transform.DOScale(Vector3.one * 1.2f, 0.5f));
-            seq.Append(transform.DOMove(level.position, 0.5f)).Join(transform.DOScale(Vector3.one * 0.5f, 0.5f));
+            seq.Append(transform.DOScale(transform.localScale * 1.5f, 1f));
+            seq.Append(transform.DOMove(level.position, 0.5f)).Join(transform.DOScale(Vector3.one * 0.6f, 0.5f));
             seq.AppendCallback(() =>
             {
                 transform.SetParent(levelSystem.currentMissionDestination.transform);

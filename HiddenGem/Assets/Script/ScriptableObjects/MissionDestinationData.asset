@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MissionDestinationData
   m_EditorClassIdentifier: 
   MissionDestinations:
-  - {fileID: 2148446512203648802, guid: 3fdaf692d4598564a8e120f558a4e434, type: 3}
+  - {fileID: 8198475408706603533, guid: 892574ee765f2db4080f795717ebd33a, type: 3}

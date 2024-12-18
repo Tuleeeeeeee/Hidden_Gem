@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Tuleeeeee.Enum;
 using Tuleeeeee.GameSystem;
@@ -14,6 +15,14 @@ namespace Tuleeeeee.Features.Mission
         public Transform GetDestination(RuneType runeType)
         {
             return Destinations.Find(x => x.runeType == runeType).transform;
+        }
+        
+        public Transform GetClosestDestination(RuneType runeType, Vector3 position)
+        {
+            return Destinations
+                .Where(x => x.runeType == runeType)
+                .OrderBy(x => Vector3.Distance(x.transform.position, position))
+                .FirstOrDefault()?.transform;
         }
 
         private void Start()

@@ -5,6 +5,7 @@ namespace Tuleeeeee.Model
     public class LevelModel
     {
         public RuneType[,] CloneTable;
+
         public int CrushCount;
 
         public bool HasClear()

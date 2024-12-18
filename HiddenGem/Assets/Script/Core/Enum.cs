@@ -1,5 +1,3 @@
-
-
 namespace Tuleeeeee.Enum
 {
     public class Enum
